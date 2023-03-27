@@ -1,5 +1,6 @@
 import React, { Fragment, useState } from 'react';
 import MoviesList from './components/MoviesList';
+import axios from 'axios';
 import './App.css';
 
 function App() {
@@ -12,11 +13,8 @@ function App() {
         setError(null);
 
         try {
-            const response = await fetch('https://swapi.dev/api/films/');
-            if (!response.ok) {
-                throw new Error('Something went wrong!');
-            }
-            const data = await response.json();
+            const response = await axios.get('https://swapi.dev/api/films/');
+            const data = await response.data;
 
             const transformedMovies = data.results.map(movieData => {
                 return {
@@ -26,6 +24,7 @@ function App() {
                     releaseDate: movieData.release_date
                 };
             });
+
             setMovies(transformedMovies);
             setIsLoading(false);
         } catch (error) {
