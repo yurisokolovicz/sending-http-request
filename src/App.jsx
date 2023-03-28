@@ -13,20 +13,24 @@ function App() {
         setIsLoading(true);
         setError(null);
 
+        // GET request to get the data from the database
         try {
             const response = await axios.get('https://react-http-f7e2d-default-rtdb.firebaseio.com/movies.json');
             const data = await response.data;
+            console.log(data);
 
-            const transformedMovies = data.results.map(movieData => {
-                return {
-                    id: movieData.episode_id,
-                    title: movieData.title,
-                    openingText: movieData.opening_crawl,
-                    releaseDate: movieData.release_date
-                };
-            });
+            const loadedMovies = [];
 
-            setMovies(transformedMovies);
+            for (const key in data) {
+                loadedMovies.push({
+                    id: key,
+                    title: data[key].title,
+                    openingText: data[key].openingText,
+                    releaseDate: data[key].releaseDate
+                });
+            }
+
+            setMovies(loadedMovies);
             setIsLoading(false);
         } catch (error) {
             setError(error.message);
@@ -38,8 +42,17 @@ function App() {
         fetchMoviesHandler();
     }, [fetchMoviesHandler]);
 
-    function addMovieHandler(movie) {
-        console.log(movie);
+    // POST request to add a new movie to the 'firebase' database
+    async function addMovieHandler(movie) {
+        const response = fetch('https://react-http-f7e2d-default-rtdb.firebaseio.com/movies.json', {
+            method: 'POST',
+            body: JSON.stringify(movie),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        const data = await response.json();
+        console.log(data);
     }
 
     let content = <p>Found no movies.</p>;
